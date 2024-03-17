@@ -1,0 +1,42 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+test = pd.read_csv('test.csv', nrows=1251)
+train = pd.read_csv('train.csv', nrows=1251)
+
+independent_train = train[['Age', 'AI_Interaction_Level', 'Satisfaction_with_AI_Services', 'AI_Personalization_Effectiveness', 'AI_Response_Time', 'Overall_Usage_Frequency', 'Customer_Service_Interactions', 'Change_in_Usage_Patterns']]
+independent_test = test[['Age', 'AI_Interaction_Level', 'Satisfaction_with_AI_Services', 'AI_Personalization_Effectiveness', 'AI_Response_Time', 'Overall_Usage_Frequency', 'Customer_Service_Interactions', 'Change_in_Usage_Patterns']]
+
+#print(independent_train)
+
+pls = PLSRegression(n_components=2)
+#pls.fit(independent_train, churn_train)
+# print(satisfaction_train)
+
+pls.fit(independent_train, train[['Customer_Churn']])
+# prediction_train = pls.predict(train[['Satisfaction_with_AI_Services']])
+prediction_test = pls.predict(independent_test)
+
+print(prediction_test)
+
+mse_train = mean_squared_error(prediction_test, test[['Customer_Churn']])
+print(mse_train)
+
+predictions_df = pd.DataFrame(prediction_test, columns=['Customer_Churn'])
+
+# Concatenate the IDs with the predicted values into a new DataFrame
+result_df = pd.DataFrame({'ID': test['ID'], 'Customer_Churn': predictions_df['Customer_Churn']})
+
+result_df['Customer_Churn'] = result_df['Customer_Churn'].round().astype(int)
+
+# Write the result DataFrame to a CSV file
+result_df.to_csv('predicted_values_with_ids.csv', index=False)
+
+# print(pls.x_loadings_)
+
+# mse_test = mean_squared_error(test[['Customer_Churn']].head(prediction_test.shape[0]), prediction_test)

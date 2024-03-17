@@ -1,0 +1,41 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+test = pd.read_csv('test.csv')
+train = pd.read_csv('train.csv')
+
+
+age_train = train.Age
+aiInterLevel_train = train.AI_Interaction_Level
+satisfaction_train = train.Satisfaction_with_AI_Services
+personal_train = train.AI_Personalization_Effectiveness
+response_train = train.AI_Response_Time
+frequency_train = train.Overall_Usage_Frequency
+interactions_train = train.Customer_Service_Interactions
+patterns_train = train.Change_in_Usage_Patterns
+churn_train = train.Customer_Churn
+
+independent_train = train[['Age', 'AI_Interaction_Level', 'Satisfaction_with_AI_Services', 'AI_Personalization_Effectiveness', 'AI_Response_Time', 'Overall_Usage_Frequency', 'Customer_Service_Interactions', 'Change_in_Usage_Patterns']]
+independent_test = test[['Age', 'AI_Interaction_Level', 'Satisfaction_with_AI_Services', 'AI_Personalization_Effectiveness', 'AI_Response_Time', 'Overall_Usage_Frequency', 'Customer_Service_Interactions', 'Change_in_Usage_Patterns']]
+
+#print(independent_train)
+
+pls = PLSRegression(n_components=1)
+#pls.fit(independent_train, churn_train)
+# print(satisfaction_train)
+
+pls.fit(train[['Satisfaction_with_AI_Services']], churn_train)
+prediction_train = pls.predict(train[['Satisfaction_with_AI_Services']])
+# # prediction_test = pls.predict(independent_test.head(train.shape[0]))
+
+mse_train = mean_squared_error(churn_train, prediction_train)
+print(mse_train)
+
+# print(pls.x_loadings_)
+
+# mse_test = mean_squared_error(test[['Customer_Churn']].head(prediction_test.shape[0]), prediction_test)
